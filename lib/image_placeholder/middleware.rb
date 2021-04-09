@@ -1,4 +1,5 @@
 require 'net/http'
+require 'webrick'
 
 module ImagePlaceholder
   class Middleware
@@ -11,7 +12,7 @@ module ImagePlaceholder
 
     def call(env)
       status, headers, response = @app.call(env)
-      request_path = URI::DEFAULT_PARSER.decode(Rack::Request.new(env).fullpath)
+      request_path = WEBrick::HTTPUtils.unescape(Rack::Request.new(env).fullpath)
 
       if not_found?(status) && image?(request_path)
         serve_placeholder_image(matched_size(request_path))
